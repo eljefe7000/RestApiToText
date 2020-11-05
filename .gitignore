@@ -3,3 +3,26 @@
 ################################################################################
 
 /.vs/RestApiToText/v16
+/RestApiToText/RestApiToText.vcxproj.filters
+/RestApiToText/RestApiToText.vcxproj.user
+/RestApiToText/Debug/RestApiToText.tlog
+/RestApiToText/Debug
+/Debug/RestApiToText.lib
+/Debug/RestApiToText.ilk
+/Debug/RestApiToText.exp
+/RestApiToText/x64/Debug/RestApiToText.tlog
+/x64/Debug
+/x64/Release/RestApiToText.pdb
+/x64/Release/RestApiToText.lib
+/x64/Release/RestApiToText.ipdb
+/x64/Release/RestApiToText.iobj
+/x64/Release/RestApiToText.exp
+/Debug
+/RestApiToText/Release/RestApiToText.tlog
+/RestApiToText/Release
+/RestApiToText/x64
+/Release/RestApiToText.pdb
+/Release/RestApiToText.lib
+/Release/RestApiToText.ipdb
+/Release/RestApiToText.iobj
+/Release/RestApiToText.exp
