@@ -1,0 +1,83 @@
+version: 1.4.{build}
+image: Visual Studio 2022
+
+
+environment:
+  matrix:
+  - PlatformToolset: v143
+
+platform:
+    - x64
+    - Win32
+    - arm64
+
+configuration:
+    - Release
+    - Debug
+
+install:
+    - if "%platform%"=="x64" set archi=amd64
+    - if "%platform%"=="x64" set platform_input=x64
+
+    - if "%platform%"=="Win32" set archi=x86
+    - if "%platform%"=="Win32" set platform_input=x86
+
+    - if "%platform%"=="arm64" set archi=amd64_arm64
+    - if "%platform%"=="arm64" set platform_input=arm64
+
+    - if "%PlatformToolset%"=="v142" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" %archi%
+    - if "%PlatformToolset%"=="v143" call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" %archi%
+
+
+build_script:
+    - cd "%APPVEYOR_BUILD_FOLDER%"
+    - msbuild RestApiToText.sln /m /p:configuration="%configuration%" /p:platform="%platform_input%" /p:PlatformToolset="%PlatformToolset%" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+after_build:
+    - cd "%APPVEYOR_BUILD_FOLDER%"
+    - ps: >-
+
+        if ($env:PLATFORM_INPUT -eq "x64") {
+            Push-AppveyorArtifact "$env:PLATFORM\$env:CONFIGURATION\RestApiToText.dll" -FileName RestApiToText.dll
+        }
+
+        if ($env:PLATFORM_INPUT -eq "x86" ) {
+            Push-AppveyorArtifact "$env:CONFIGURATION\RestApiToText.dll" -FileName RestApiToText.dll
+        }
+
+        if ($env:PLATFORM_INPUT -eq "arm64") {
+            Push-AppveyorArtifact "$env:PLATFORM\$env:CONFIGURATION\RestApiToText.dll" -FileName RestApiToText.dll
+        }
+
+
+        if ($($env:APPVEYOR_REPO_TAG) -eq "true" -and $env:CONFIGURATION -eq "Release" -and $env:PLATFORMTOOLSET -eq "v143") {
+            if($env:PLATFORM_INPUT -eq "x64"){
+                $ZipFileName = "RestApiToText_$($env:APPVEYOR_REPO_TAG_NAME)_x64.zip"
+                7z a $ZipFileName "$($env:APPVEYOR_BUILD_FOLDER)\$env:PLATFORM_INPUT\$env:CONFIGURATION\*.dll"
+            }
+            if($env:PLATFORM_INPUT -eq "x86"){
+                $ZipFileName = "RestApiToText_$($env:APPVEYOR_REPO_TAG_NAME)_x86.zip"
+                7z a $ZipFileName "$($env:APPVEYOR_BUILD_FOLDER)\$env:CONFIGURATION\*.dll"
+            }
+            if($env:PLATFORM_INPUT -eq "arm64"){
+                $ZipFileName = "RestApiToText_$($env:APPVEYOR_REPO_TAG_NAME)_arm64.zip"
+                7z a $ZipFileName "$($env:APPVEYOR_BUILD_FOLDER)\$env:PLATFORM_INPUT\$env:CONFIGURATION\*.dll"
+            }
+        }
+
+artifacts:
+  - path: RestApiToText_*.zip
+    name: releases
+
+deploy:
+    provider: GitHub
+    auth_token:
+        secure: !!!TODO
+    artifact: releases
+    draft: false
+    prerelease: false
+    force_update: true
+    on:
+        appveyor_repo_tag: true
+        PlatformToolset: v143
+        configuration: Release
