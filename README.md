@@ -8,11 +8,11 @@ All files for this package are licensed under the GPL v3 license.&nbsp;&nbsp;See
 
 Break Fixes
 -----------
-Notepad++ currently provides version 1.0 of RestApiToText.  Version 1.1 of RestApiToText.dll is available for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.1/RestApiToText.dll">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.1/RestApiToText.dll">here</a>. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
+Notepad++ currently provides version 1.0 of RestApiToText.  Version 1.1 of RestApiToText.dll is available for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.1/RestApiToText.dll">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.1/RestApiToText.dll">here</a> or by navigating the __Release__ and __x64/Release__ folders above. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
 
 Here are the steps to overwrite the DLL:
 
-1. Open Notepad++ and go to Plugins->Open Plugins Folder...
+1. Open Notepad++ and go to __Plugins->Open Plugins Folder...__
 2. Close Notepad++.
 3. In the Explorer window you created from Step 1, open the RestApiToText subfolder.
 4. Overwrite the RestApiToText DLL with the one you downloaded.
