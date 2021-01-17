@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION 1,1,0,0
+ PRODUCTVERSION 1,1,0,0
  FILEFLAGSMASK 0x0L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -68,11 +68,11 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "RestApiToText: A free Notepad++ plugin to make REST calls."
-            VALUE "FileVersion", "1.0.0.0"
+            VALUE "FileVersion", "1.1.0.0"
             VALUE "LegalCopyright", "Copyleft 2020 by Jeffrey Smith"
             VALUE "OriginalFilename", "RestApiToText.dll"
             VALUE "ProductName", "RestApiToText"
-            VALUE "ProductVersion", "1.0.0.0"
+            VALUE "ProductVersion", "1.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -87,12 +87,12 @@ END
 // Dialog
 //
 
-IDD_HELP DIALOGEX 0, 0, 343, 260
+IDD_HELP DIALOGEX 0, 0, 343, 273
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "REST API To Text Help"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,286,239,50,14
+    DEFPUSHBUTTON   "OK",IDOK,286,252,50,14
     LTEXT           "Make a REST API call and get the results in a new Notepad++ tab.",IDC_STATIC,7,7,214,8
     LTEXT           "Here is how it works:",IDC_STATIC,7,21,68,8
     LTEXT           "1.  At the start of a line, type in the elements of a REST call.  Put each header on its own line.",IDC_STATIC,7,36,301,8
@@ -108,8 +108,9 @@ BEGIN
     LTEXT           "(The **Headers** line tells RestApiToText that you have headers to send)",IDC_STATIC,7,102,279,8
     LTEXT           "- If the page has content besides the REST call, select the REST content before making the call.",IDC_STATIC,17,166,307,8
     GROUPBOX        "Example",IDC_STATIC,7,52,171,48
-    GROUPBOX        "Notes",IDC_STATIC,7,154,329,80
+    GROUPBOX        "Notes",IDC_STATIC,7,154,329,95
     LTEXT           "- Prepending the URL with HTTP:// or HTTPS:// is optional.",IDC_STATIC,17,192,187,8
+    LTEXT           "- For more info, or to download break fixes, please click on the project link in the About window.",IDC_STATIC,18,230,308,8
 END
 
 IDD_RESTAPITOTEXT DIALOGEX 0, 0, 249, 123
@@ -143,7 +144,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 336
         TOPMARGIN, 7
-        BOTTOMMARGIN, 253
+        BOTTOMMARGIN, 266
     END
 
     IDD_RESTAPITOTEXT, DIALOG

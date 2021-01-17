@@ -1,10 +1,24 @@
 # RestApiToText for <a href="https://notepad-plus-plus.org">Notepad++</a>
 
-RestApiToText is a plugin that will use the text from a Notepad++ editor tab to make a REST call and display the results in a new editor tab, eliminating the need for calling an outside REST tool and pasting the results into Notepad++.
+RestApiToText is a plugin that will use the text from a Notepad++ editor tab to make a REST call and display the results in a new editor tab, eliminating the need for calling an outside REST tool and pasting the results into Notepad++.  Special thanks to Don Ho and the many developers and contributors for making Notepad++ possible.
 
 License
 -------
 All files for this package are licensed under the GPL v3 license.&nbsp;&nbsp;See the LICENSE file for more details.
+
+Break Fixes
+-----------
+Notepad++ currently provides version 1.0 of RestApiToText.  Version 1.1 of RestApiToText.dll is available for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.1/RestApiToText.dll">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.1/RestApiToText.dll">here</a>. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
+
+Here are the steps to overwrite the DLL:
+
+1. Open Notepad++ and go to Plugins->Open Plugins Folder...
+2. Close Notepad++.
+3. In the Explorer window you created from Step 1, open the RestApiToText subfolder.
+4. Overwrite the RestApiToText DLL with the one you downloaded.
+5. Reopen Notepad++.
+
+Version 1.1 fixes incorrect HTTP/S configurations that would result in "400 - Bad Request" or "405 - Method Not Allowed" in some situations.  It also disables default WinInet caching.
 
 Usage
 -----

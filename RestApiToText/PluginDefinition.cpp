@@ -93,7 +93,7 @@ void commandMenuInit()
 //
 void commandMenuCleanUp()
 {
-	// Don't forget to deallocate your shortcut here
+    // Don't forget to deallocate your shortcut here
     delete funcItem[0]._pShKey;
     delete funcItem[1]._pShKey;
     delete funcItem[2]._pShKey;
@@ -155,7 +155,7 @@ INT_PTR CALLBACK GenericProcessor(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 //
 // This function help you to initialize your plugin commands
 //
-bool setCommand(size_t index, LPCTSTR cmdName, PFUNCPLUGINCMD pFunc, ShortcutKey *sk, bool check0nInit)
+bool setCommand(size_t index, LPCTSTR cmdName, PFUNCPLUGINCMD pFunc, ShortcutKey* sk, bool check0nInit)
 {
     if (index >= nbFunc)
         return false;
@@ -215,7 +215,7 @@ void MakeRestCall()
 
     ::SendMessage(curScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
 
-    array<string, 5> restVerbs = { "get", "post", "put", "patch", "delete" };
+    array<string, 5> restVerbs = { "GET", "POST", "PUT", "PATCH", "DELETE" };
     string s(selectedText);
     string eol("\r\n");
     string headerSeparator(": ");
@@ -232,14 +232,15 @@ void MakeRestCall()
     string::iterator tokenIterator;
     const string httpProtocol("http://");
     const string httpsProtocol("https://");
-    LPSTR lpSelectedText = const_cast<char *>(s.c_str());
+    LPSTR lpSelectedText = const_cast<char*>(s.c_str());
     BOOL firstLine = TRUE;
     BOOL doneWithHeaders = FALSE;
     BOOL doneWithBody = FALSE;
     BOOL workingOnHeaders = FALSE;
     BOOL workingOnBody = FALSE;
+    BOOL httpsProtocolFound = FALSE;
     map<string, string> headers;
-    map<string, string> :: iterator headerIterator;
+    map<string, string> ::iterator headerIterator;
     char* nextToken;
     rsize_t strmax = sizeof selectedText;
     size_t slashIndex = 0;
@@ -290,7 +291,7 @@ void MakeRestCall()
 
                 // Make the verb lowercase for string comparisons
                 std::transform(verb.begin(), verb.end(), verb.begin(),
-                    [](unsigned char c) { return std::tolower(c); });
+                    [](unsigned char c) { return std::toupper(c); });
 
                 if (!any_of(restVerbs.begin(), restVerbs.end(), [verb](string v) {return v == verb; }))
                 {
@@ -310,9 +311,16 @@ void MakeRestCall()
 
                 // Remove the HTTP/S protocol if it's there
                 if (strToken.find(httpProtocol) != string::npos)
+                {
                     url = url.substr(httpProtocol.length());
+                    port = INTERNET_DEFAULT_HTTP_PORT;
+                }
                 else if (strToken.find(httpsProtocol) != string::npos)
+                {
+                    httpsProtocolFound = TRUE;
                     url = url.substr(httpsProtocol.length());
+                    port = INTERNET_DEFAULT_HTTPS_PORT;
+                }
 
                 // Find the port if it was included
                 size_t portIndex = url.find(portSeparator.c_str());
@@ -370,17 +378,17 @@ void MakeRestCall()
         token = ::strtok_s(NULL, eol.c_str(), &nextToken);
     }
 
-
-    if (port == 0)
+    if (httpsProtocolFound && port == 0)
         port = INTERNET_DEFAULT_HTTPS_PORT;
 
     wstring wsDomain = wstring(domain.begin(), domain.end());
     wstring wsPath = wstring(path.begin(), path.end());
     wstring wsVerb = wstring(verb.begin(), verb.end());
+    DWORD dwInternetOptions = (httpsProtocolFound || port == INTERNET_DEFAULT_HTTPS_PORT ? INTERNET_FLAG_SECURE : 0) | INTERNET_FLAG_NO_CACHE_WRITE;
 
     HINTERNET hSession = InternetOpen(TEXT("Mozilla/5.0"), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
     HINTERNET hConnect = InternetConnect(hSession, wsDomain.c_str(), port, TEXT(""), TEXT(""), INTERNET_SERVICE_HTTP, 0, 0);
-    HINTERNET hRequest = HttpOpenRequest(hConnect, wsVerb.c_str(), wsPath.c_str(), NULL, NULL, NULL, INTERNET_FLAG_SECURE, 0);
+    HINTERNET hRequest = HttpOpenRequest(hConnect, wsVerb.c_str(), wsPath.c_str(), NULL, NULL, NULL, dwInternetOptions, 0);
     //WCHAR szHeader[BUFSIZ] = { 0 };
     wstring wsHeaders;
 
@@ -402,12 +410,12 @@ void MakeRestCall()
     LPVOID lpOptions = 0;
     int bodyLength = 0;
 
-    if (verb == "post" || verb == "put")
+    if (verb == "POST" || verb == "PUT")
     {
         lpOptions = (LPVOID)body.c_str();
         bodyLength = body.length();
     }
-        
+
 
     if (!HttpSendRequest(hRequest, NULL, 0, lpOptions, bodyLength))
     {
@@ -425,7 +433,7 @@ void MakeRestCall()
         else
         {
             DWORD dwBufSize = BUFSIZ + 1;
-            char * buffer = new char[BUFSIZ + 1];
+            char* buffer = new char[BUFSIZ + 1];
             memset(buffer, 0x00, sizeof(buffer));
 
             while (true)
@@ -473,7 +481,7 @@ string CheckForError(HINTERNET hRequest)
     LPVOID lpOutBuffer = NULL;
     DWORD dwSize = 0;
     string response("");
-    char * outBuffer = NULL;
+    char* outBuffer = NULL;
     DWORD dwError = 0;
     DWORD dwLen = 1024;
     TCHAR* pBuff = new TCHAR[dwLen];
