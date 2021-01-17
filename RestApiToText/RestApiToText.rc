@@ -124,7 +124,7 @@ BEGIN
     RTEXT           "License:",IDC_STATIC_LICENSE_LABEL,10,42,52,8
     LTEXT           "GNU GPL v3",IDC_STATIC_LICENSE,66,43,39,8
     RTEXT           "Version:",IDC_STATIC_VERSION_LABEL,10,60,52,8
-    LTEXT           "1.0",IDC_STATIC_VERSION,66,60,44,8
+    LTEXT           "1.1",IDC_STATIC_VERSION,66,60,44,8
     RTEXT           "Project:",IDC_STATIC_PROJECT_LABEL,10,78,52,8
     CONTROL         "<a href=""https://github.com/eljefe7000/RestApiToText"">https://github.com/eljefe7000/RestApiToText</a>",IDC_SYSLINK_PROJECT,
                     "SysLink",WS_TABSTOP,67,78,155,14
