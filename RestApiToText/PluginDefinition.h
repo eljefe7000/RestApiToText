@@ -77,4 +77,6 @@ void AboutDialog();
 void HelpDialog();
 INT_PTR CALLBACK GenericProcessor(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 string CheckForError(HINTERNET hRequest);
+BOOL IsContentTypeResponseHeaderForJson(HINTERNET hRequest);
+string GetResponseHeaders(HINTERNET hRequest);
 

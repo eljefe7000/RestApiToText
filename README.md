@@ -18,7 +18,7 @@ Here are the steps to overwrite the DLL:
 4. Overwrite the RestApiToText DLL with the one you downloaded.
 5. Reopen Notepad++.
 
-Version 1.1 fixes incorrect HTTP/S configurations that would result in "400 - Bad Request" or "405 - Method Not Allowed" in some situations.  It also disables default WinInet caching.
+See [Changes by Version](#changes-by-version) below for a list of changes.
 
 Usage
 -----
@@ -42,4 +42,15 @@ Notes
 ![screenshot](/Screenshot3.png?raw=true "Examples for other REST verbs")
 
 
+## Changes by Version
+v1.2:
+1. Added JSON pretty-printing for responses with a Content-Type response header containing "application/json".
+2. Added support for the HEAD and OPTIONS verbs.
+3. URLs with no verb now default to a GET.
 
+v1.1:
+1. Fixed incorrect HTTP/S configurations that would result in "400 - Bad Request" or "405 - Method Not Allowed" in some situations.
+2. Disabled default WinInet caching.
+
+v1.0:
+1. Initial release.

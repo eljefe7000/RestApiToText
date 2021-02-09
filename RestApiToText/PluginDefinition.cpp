@@ -33,6 +33,7 @@
 #include <WinInet.h>
 #include "resource.h"
 #include <CommCtrl.h>
+#include <unordered_set>
 
 using namespace std;
 
@@ -215,7 +216,7 @@ void MakeRestCall()
 
     ::SendMessage(curScintilla, SCI_GETSELTEXT, 0, (LPARAM)selectedText);
 
-    array<string, 5> restVerbs = { "GET", "POST", "PUT", "PATCH", "DELETE" };
+    array<string, 7> restVerbs = { "GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" };
     string s(selectedText);
     string eol("\r\n");
     string headerSeparator(": ");
@@ -295,8 +296,8 @@ void MakeRestCall()
 
                 if (!any_of(restVerbs.begin(), restVerbs.end(), [verb](string v) {return v == verb; }))
                 {
-                    ::MessageBox(NULL, L"Verb not found.  Please open the help dialog for instructions on sending the request", L"ApiToText", MB_OK | MB_ICONERROR);
-                    return;
+                    verb = "GET";
+                    index = 0;
                 }
 
                 strToken = strToken.substr(index);
@@ -426,39 +427,102 @@ void MakeRestCall()
     }
     else
     {
-        string errorMessage = CheckForError(hRequest);
-
-        if (!errorMessage.empty())
-            response = errorMessage;
+        if (verb == "HEAD" || verb == "OPTIONS")
+            response = GetResponseHeaders(hRequest);
         else
         {
-            DWORD dwBufSize = BUFSIZ + 1;
-            char* buffer = new char[BUFSIZ + 1];
-            memset(buffer, 0x00, sizeof(buffer));
+            BOOL contentTypeIsJson = IsContentTypeResponseHeaderForJson(hRequest);
 
-            while (true)
+            string errorMessage = CheckForError(hRequest);
+
+            if (!errorMessage.empty())
+                response = errorMessage;
+            else
             {
-                DWORD dwBytesRead;
-                BOOL bRead;
+                DWORD dwBufSize = BUFSIZ + 1;
+                char* buffer = new char[BUFSIZ + 1];
+                memset(buffer, 0x00, sizeof(buffer));
+                unordered_set<char> delimiters = { '{', '}', '[', ']', ',' };
+                int nbrTabs = 0;
+                BOOL isEscaped = FALSE;
+                BOOL insideQuotedString = FALSE;
 
-                bRead = InternetReadFile(hRequest, buffer, BUFSIZ, &dwBytesRead);
 
-                string strBuffer(buffer);
-                wstring wStrBuffer(strBuffer.begin(), strBuffer.end());
-
-                if (dwBytesRead == 0)
-                    break;
-
-                if (!bRead)
+                while (true)
                 {
-                    DWORD dwError = GetLastError();
-                    response.append("InternetReadFile error: ");
-                    break;
-                }
-                else
-                {
-                    buffer[dwBytesRead] = 0;
-                    response += strBuffer.substr(0, dwBytesRead);
+                    DWORD dwBytesRead;
+                    BOOL bRead;
+
+                    bRead = InternetReadFile(hRequest, buffer, BUFSIZ, &dwBytesRead);
+
+                    string strBuffer(buffer);
+                    wstring wStrBuffer(strBuffer.begin(), strBuffer.end());
+
+                    if (dwBytesRead == 0)
+                        break;
+
+                    if (!bRead)
+                    {
+                        DWORD dwError = GetLastError();
+                        response.append("InternetReadFile error: ");
+                        break;
+                    }
+                    else
+                    {
+                        buffer[dwBytesRead] = 0;
+
+                        if (contentTypeIsJson)
+                        {
+                            for (int i = 0; i < BUFSIZ; i++)
+                            {
+                                if (buffer[i] == '"' && !isEscaped)
+                                    insideQuotedString = !insideQuotedString;
+
+                                isEscaped = (buffer[i] == '\\');
+
+                                if (!insideQuotedString && delimiters.find(buffer[i]) != delimiters.end())
+                                {
+                                    switch (buffer[i])
+                                    {
+                                    case '{':
+                                    case '[':
+                                        nbrTabs++;
+                                        response.push_back(buffer[i]);
+                                        response.push_back('\n');
+
+                                        for (int i = 0; i < nbrTabs; i++)
+                                            response.push_back('\t');
+
+                                        break;
+
+                                    case '}':
+                                    case ']':
+                                        nbrTabs--;
+                                        response.push_back('\n');
+
+                                        for (int i = 0; i < nbrTabs; i++)
+                                            response.push_back('\t');
+
+                                        response.push_back(buffer[i]);
+                                        break;
+
+                                    case ',':
+                                        response.push_back(buffer[i]);
+                                        response.push_back('\n');
+
+                                        for (int i = 0; i < nbrTabs; i++)
+                                            response.push_back('\t');
+
+                                        break;
+                                    }
+                                }
+                                else
+                                    response.push_back(buffer[i]);
+                            }
+                        }
+                        else
+                            response += strBuffer.substr(0, dwBytesRead);
+                    }
                 }
             }
         }
@@ -473,6 +537,78 @@ void MakeRestCall()
     ::SendMessage(curScintilla, SCI_SETTEXT, 0, (LPARAM)response.c_str());
 
     delete[] selectedText;
+}
+
+string GetResponseHeaders(HINTERNET hRequest)
+{
+    LPVOID lpOutBuffer = NULL;
+    DWORD dwSize = 0;
+    BOOL contentTypeIsJson = FALSE;
+    string responseHeaders;
+
+    while (!HttpQueryInfo(hRequest, HTTP_QUERY_RAW_HEADERS_CRLF, (LPVOID)lpOutBuffer, &dwSize, NULL))
+    {
+        if (GetLastError() == ERROR_HTTP_HEADER_NOT_FOUND)
+            return "";
+        else
+        {
+            if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+                lpOutBuffer = new wchar_t[dwSize];
+            else
+            {
+                if (lpOutBuffer)
+                    delete[] lpOutBuffer;
+
+                return "";
+            }
+        }
+    }
+
+    if (lpOutBuffer)
+    {
+        wstring wResponseHeaders = (wchar_t *)lpOutBuffer;
+        responseHeaders.append(wResponseHeaders.begin(), wResponseHeaders.end());
+
+        delete[] lpOutBuffer;
+    }
+
+    return responseHeaders;
+}
+
+BOOL IsContentTypeResponseHeaderForJson(HINTERNET hRequest)
+{
+    LPVOID lpOutBuffer = NULL;
+    DWORD dwSize = 0;
+    BOOL contentTypeIsJson = FALSE;
+
+    while (!HttpQueryInfo(hRequest, HTTP_QUERY_CONTENT_TYPE, (LPVOID)lpOutBuffer, &dwSize, NULL))
+    {
+        if (GetLastError() == ERROR_HTTP_HEADER_NOT_FOUND)
+            return TRUE;
+        else
+        {
+            if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+                lpOutBuffer = new wchar_t[dwSize];
+            else
+            {
+                if (lpOutBuffer)
+                    delete[] lpOutBuffer;
+
+                return FALSE;
+            }
+        }
+    }
+
+    if (lpOutBuffer)
+    {
+        wstring responseCode((wchar_t *)lpOutBuffer);
+        std::transform(responseCode.begin(), responseCode.end(), responseCode.begin(), towlower);
+        contentTypeIsJson = (responseCode.find(L"application/json") != wstring::npos);
+
+        delete[] lpOutBuffer;
+    }
+
+    return contentTypeIsJson;
 }
 
 
