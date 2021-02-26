@@ -79,4 +79,5 @@ INT_PTR CALLBACK GenericProcessor(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 string CheckForError(HINTERNET hRequest);
 BOOL IsContentTypeResponseHeaderForJson(HINTERNET hRequest);
 string GetResponseHeaders(HINTERNET hRequest);
+string FormatResponseIntoJson(string response);
 

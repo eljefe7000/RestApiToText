@@ -442,10 +442,6 @@ void MakeRestCall()
                 DWORD dwBufSize = BUFSIZ + 1;
                 char* buffer = new char[BUFSIZ + 1];
                 memset(buffer, 0x00, sizeof(buffer));
-                unordered_set<char> delimiters = { '{', '}', '[', ']', ',' };
-                int nbrTabs = 0;
-                BOOL isEscaped = FALSE;
-                BOOL insideQuotedString = FALSE;
 
 
                 while (true)
@@ -470,60 +466,12 @@ void MakeRestCall()
                     else
                     {
                         buffer[dwBytesRead] = 0;
-
-                        if (contentTypeIsJson)
-                        {
-                            for (int i = 0; i < BUFSIZ; i++)
-                            {
-                                if (buffer[i] == '"' && !isEscaped)
-                                    insideQuotedString = !insideQuotedString;
-
-                                isEscaped = (buffer[i] == '\\');
-
-                                if (!insideQuotedString && delimiters.find(buffer[i]) != delimiters.end())
-                                {
-                                    switch (buffer[i])
-                                    {
-                                    case '{':
-                                    case '[':
-                                        nbrTabs++;
-                                        response.push_back(buffer[i]);
-                                        response.push_back('\n');
-
-                                        for (int i = 0; i < nbrTabs; i++)
-                                            response.push_back('\t');
-
-                                        break;
-
-                                    case '}':
-                                    case ']':
-                                        nbrTabs--;
-                                        response.push_back('\n');
-
-                                        for (int i = 0; i < nbrTabs; i++)
-                                            response.push_back('\t');
-
-                                        response.push_back(buffer[i]);
-                                        break;
-
-                                    case ',':
-                                        response.push_back(buffer[i]);
-                                        response.push_back('\n');
-
-                                        for (int i = 0; i < nbrTabs; i++)
-                                            response.push_back('\t');
-
-                                        break;
-                                    }
-                                }
-                                else
-                                    response.push_back(buffer[i]);
-                            }
-                        }
-                        else
-                            response += strBuffer.substr(0, dwBytesRead);
+                        response += strBuffer.substr(0, dwBytesRead);
                     }
                 }
+
+                if (contentTypeIsJson)
+                    response = FormatResponseIntoJson(response);
             }
         }
     }
@@ -537,6 +485,64 @@ void MakeRestCall()
     ::SendMessage(curScintilla, SCI_SETTEXT, 0, (LPARAM)response.c_str());
 
     delete[] selectedText;
+}
+
+string FormatResponseIntoJson(string response)
+{
+    string json;
+    BOOL isEscaped = FALSE;
+    BOOL insideQuotedString = FALSE;
+    unordered_set<char> delimiters = { '{', '}', '[', ']', ',' };
+    int nbrTabs = 0;
+
+    for (int i = 0; i < response.length(); i++)
+    {
+        if (response[i] == '"' && !isEscaped)
+            insideQuotedString = !insideQuotedString;
+
+        isEscaped = (response[i] == '\\');
+
+        if (!insideQuotedString && delimiters.find(response[i]) != delimiters.end())
+        {
+            switch (response[i])
+            {
+            case '{':
+            case '[':
+                nbrTabs++;
+                json.push_back(response[i]);
+                json.push_back('\n');
+
+                for (int i = 0; i < nbrTabs; i++)
+                    json.push_back('\t');
+
+                break;
+
+            case '}':
+            case ']':
+                nbrTabs--;
+                json.push_back('\n');
+
+                for (int i = 0; i < nbrTabs; i++)
+                    json.push_back('\t');
+
+                json.push_back(response[i]);
+                break;
+
+            case ',':
+                json.push_back(response[i]);
+                json.push_back('\n');
+
+                for (int i = 0; i < nbrTabs; i++)
+                    json.push_back('\t');
+
+                break;
+            }
+        }
+        else
+            json.push_back(response[i]);
+    }
+
+    return json;
 }
 
 string GetResponseHeaders(HINTERNET hRequest)

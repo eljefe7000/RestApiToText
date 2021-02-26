@@ -43,14 +43,17 @@ Notes
 
 
 ## Changes by Version
-v1.2:
+<u>v1.2.1</u>
+1. Fixed issue where InternetReadFile was stopping prematurely because the output was being formatted to JSON as it was being read.
+
+<u>v1.2</u>
 1. Added JSON pretty-printing for responses with a Content-Type response header containing "application/json".
 2. Added support for the HEAD and OPTIONS verbs.
 3. URLs with no verb now default to a GET.
 
-v1.1:
+<u>v1.1</u>
 1. Fixed incorrect HTTP/S configurations that would result in "400 - Bad Request" or "405 - Method Not Allowed" in some situations.
 2. Disabled default WinInet caching.
 
-v1.0:
+<u>v1.0</u>
 1. Initial release.
