@@ -14,6 +14,9 @@
 #define IDC_STATIC_VERSION              1015
 #define IDC_STATIC_PROJECT_LABEL        1016
 #define IDC_SYSLINK_PROJECT             1017
+#define IDC_STATIC_PROJECT_LABEL2       1018
+#define IDC_SYSLINK_PROJECT2            1019
+#define IDC_SYSLINK_PLUGIN_NEWS         1019
 
 // Next default values for new objects
 // 

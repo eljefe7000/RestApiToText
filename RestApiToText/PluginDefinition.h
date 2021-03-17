@@ -75,9 +75,12 @@ bool setCommand(size_t index, LPCTSTR cmdName, PFUNCPLUGINCMD pFunc, ShortcutKey
 void MakeRestCall();
 void AboutDialog();
 void HelpDialog();
+void LTrim(string* token);
+void ToUpper(string* token);
 INT_PTR CALLBACK GenericProcessor(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 string CheckForError(HINTERNET hRequest);
 BOOL IsContentTypeResponseHeaderForJson(HINTERNET hRequest);
 string GetResponseHeaders(HINTERNET hRequest);
 string FormatResponseIntoJson(string response);
+string UrlEncode(string url);
 

@@ -34,6 +34,8 @@
 #include "resource.h"
 #include <CommCtrl.h>
 #include <unordered_set>
+#include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -138,9 +140,11 @@ INT_PTR CALLBACK GenericProcessor(HWND hDlg, UINT message, WPARAM wParam, LPARAM
         {
             PNMLINK pNMLink = (PNMLINK)lParam;
             LITEM   item = pNMLink->item;
-            HWND hLink = GetDlgItem(hDlg, IDC_SYSLINK_PROJECT);
+            HWND hProjectLink = GetDlgItem(hDlg, IDC_SYSLINK_PROJECT);
+            HWND hPluginNewsLink = GetDlgItem(hDlg, IDC_SYSLINK_PLUGIN_NEWS);
+            HWND hClickedLink = ((LPNMHDR)lParam)->hwndFrom;
 
-            if ((((LPNMHDR)lParam)->hwndFrom == hLink) && (item.iLink == 0))
+            if ((hClickedLink == hProjectLink || hClickedLink == hPluginNewsLink) && (item.iLink == 0))
             {
                 ShellExecute(NULL, L"open", item.szUrl, NULL, NULL, SW_SHOW);
             }
@@ -219,7 +223,7 @@ void MakeRestCall()
     array<string, 7> restVerbs = { "GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" };
     string s(selectedText);
     string eol("\r\n");
-    string headerSeparator(": ");
+    string headerSeparator(":");
     string portSeparator(":");
     string slashSeparator("/");
     string domain;
@@ -230,6 +234,7 @@ void MakeRestCall()
     string headerValue;
     string body;
     string response;
+    string userAgent;
     string::iterator tokenIterator;
     const string httpProtocol("http://");
     const string httpsProtocol("https://");
@@ -239,7 +244,9 @@ void MakeRestCall()
     BOOL doneWithBody = FALSE;
     BOOL workingOnHeaders = FALSE;
     BOOL workingOnBody = FALSE;
+    BOOL workingOnOptions = FALSE;
     BOOL httpsProtocolFound = FALSE;
+    BOOL showResponseHeaders = FALSE;
     map<string, string> headers;
     map<string, string> ::iterator headerIterator;
     char* nextToken;
@@ -254,25 +261,33 @@ void MakeRestCall()
         string strToken(token);
 
         // Left trim any whitespace
-        strToken.erase(strToken.begin(), std::find_if(strToken.begin(), strToken.end(), [](unsigned char c) {
-            return !std::isspace(c);
-            }));
+        LTrim(&strToken);
 
         string tmpToken = strToken;
-        std::transform(tmpToken.begin(), tmpToken.end(), tmpToken.begin(),
-            [](unsigned char c) { return std::tolower(c); });
+
+        ToUpper(&tmpToken);
 
         // Check for a header or body indicator
-        if (!firstLine && !workingOnHeaders && tmpToken.rfind("**headers**", 0) != string::npos)
+        if (!firstLine && tmpToken.find("**HEADERS**", 0) != string::npos)
         {
             workingOnHeaders = TRUE;
             workingOnBody = FALSE;
+            workingOnOptions = FALSE;
             token = ::strtok_s(NULL, eol.c_str(), &nextToken);
             continue;
         }
-        else if (!firstLine && !workingOnBody && tmpToken.rfind("**body**", 0) != string::npos)
+        else if (!firstLine && tmpToken.find("**BODY**", 0) != string::npos)
         {
             workingOnBody = TRUE;
+            workingOnHeaders = FALSE;
+            workingOnOptions = FALSE;
+            token = ::strtok_s(NULL, eol.c_str(), &nextToken);
+            continue;
+        }
+        else if (!firstLine && tmpToken.find("**RESTAPITOTEXTOPTIONS**", 0) != string::npos)
+        {
+            workingOnOptions = TRUE;
+            workingOnBody = FALSE;
             workingOnHeaders = FALSE;
             token = ::strtok_s(NULL, eol.c_str(), &nextToken);
             continue;
@@ -284,15 +299,14 @@ void MakeRestCall()
             firstLine = FALSE;
 
             // Look for the space(s) separating the verb and URL
-            size_t index = strToken.find_first_of(' ', 0);
+            size_t index = strToken.find_first_of(" \t", 0);
 
             if (index > 0)
             {
                 verb = strToken.substr(0, index);
 
                 // Make the verb lowercase for string comparisons
-                std::transform(verb.begin(), verb.end(), verb.begin(),
-                    [](unsigned char c) { return std::toupper(c); });
+                ToUpper(&verb);
 
                 if (!any_of(restVerbs.begin(), restVerbs.end(), [verb](string v) {return v == verb; }))
                 {
@@ -301,11 +315,9 @@ void MakeRestCall()
                 }
 
                 strToken = strToken.substr(index);
-
+                
                 // Left trim any whitespace before the URL
-                strToken.erase(strToken.begin(), std::find_if(strToken.begin(), strToken.end(), [](unsigned char c) {
-                    return !std::isspace(c);
-                    }));
+                LTrim(&strToken);
 
                 // What's left of strToken should be the URL
                 url = strToken;
@@ -343,6 +355,16 @@ void MakeRestCall()
                     if (slashIndex != string::npos)
                         path = url.substr(slashIndex, url.length());
                 }
+
+                // If we have a querystring, let's url-encode it
+                size_t queryStringStart = url.find("?");
+
+                if (queryStringStart != string::npos && queryStringStart + 1 < url.length())
+                {
+                    string queryString = url.substr(++queryStringStart);
+                    queryString = UrlEncode(queryString);
+                    url = url.substr(0, queryStringStart) + queryString;
+                }
             }
         }
         else
@@ -350,9 +372,7 @@ void MakeRestCall()
             if (workingOnHeaders)
             {
                 // Left trim any whitespace before the header
-                strToken.erase(strToken.begin(), std::find_if(strToken.begin(), strToken.end(), [](unsigned char c) {
-                    return !std::isspace(c);
-                    }));
+                LTrim(&strToken);
 
                 size_t headerIndex = strToken.find_first_of(headerSeparator.c_str(), 0);
 
@@ -362,9 +382,7 @@ void MakeRestCall()
                     strToken = strToken.substr(headerIndex + 1);
 
                     // Left trim any whitespace before the header value
-                    strToken.erase(strToken.begin(), std::find_if(strToken.begin(), strToken.end(), [](unsigned char c) {
-                        return !std::isspace(c);
-                        }));
+                    LTrim(&strToken);
 
                     headerValue = strToken;
                     headers.insert(pair<string, string>(headerName, headerValue));
@@ -373,6 +391,14 @@ void MakeRestCall()
             else if (workingOnBody)
             {
                 body += strToken;
+            }
+            else if (workingOnOptions)
+            {
+                // Left trim any whitespace before the header
+                LTrim(&strToken);
+                ToUpper(&strToken);
+
+                showResponseHeaders = (strToken == "SHOWRESPONSEHEADERS");
             }
         }
 
@@ -411,7 +437,7 @@ void MakeRestCall()
     LPVOID lpOptions = 0;
     int bodyLength = 0;
 
-    if (verb == "POST" || verb == "PUT")
+    if (verb == "POST" || verb == "PUT" || verb == "DELETE" || verb == "PATCH")
     {
         lpOptions = (LPVOID)body.c_str();
         bodyLength = body.length();
@@ -472,6 +498,9 @@ void MakeRestCall()
 
                 if (contentTypeIsJson)
                     response = FormatResponseIntoJson(response);
+
+                if (showResponseHeaders)
+                    response = GetResponseHeaders(hRequest) + "\n\n" + response;
             }
         }
     }
@@ -485,6 +514,46 @@ void MakeRestCall()
     ::SendMessage(curScintilla, SCI_SETTEXT, 0, (LPARAM)response.c_str());
 
     delete[] selectedText;
+}
+
+void ToUpper(string* token)
+{
+    std::transform(token->begin(), token->end(), token->begin(),
+        [](unsigned char c) { return std::toupper(c); });
+
+    return;
+}
+
+void LTrim(string* token)
+{
+    token->erase(token->begin(), std::find_if(token->begin(), token->end(), [](unsigned char c) {
+        return !std::isspace(c);
+        }));
+
+    return;
+}
+
+string UrlEncode(string queryString) {
+    ostringstream escaped;
+    escaped.fill('0');
+    escaped << hex;
+
+    for (string::const_iterator i = queryString.begin(), n = queryString.end(); i != n; ++i) {
+        string::value_type c = (*i);
+
+        // Keep alphanumeric and other accepted characters intact
+        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            escaped << c;
+            continue;
+        }
+
+        // Any other characters are percent-encoded
+        escaped << uppercase;
+        escaped << '%' << setw(2) << int((unsigned char)c);
+        escaped << nouppercase;
+    }
+
+    return escaped.str();
 }
 
 string FormatResponseIntoJson(string response)
@@ -572,7 +641,7 @@ string GetResponseHeaders(HINTERNET hRequest)
 
     if (lpOutBuffer)
     {
-        wstring wResponseHeaders = (wchar_t *)lpOutBuffer;
+        wstring wResponseHeaders = (wchar_t*)lpOutBuffer;
         responseHeaders.append(wResponseHeaders.begin(), wResponseHeaders.end());
 
         delete[] lpOutBuffer;
@@ -607,7 +676,7 @@ BOOL IsContentTypeResponseHeaderForJson(HINTERNET hRequest)
 
     if (lpOutBuffer)
     {
-        wstring responseCode((wchar_t *)lpOutBuffer);
+        wstring responseCode((wchar_t*)lpOutBuffer);
         std::transform(responseCode.begin(), responseCode.end(), responseCode.begin(), towlower);
         contentTypeIsJson = (responseCode.find(L"application/json") != wstring::npos);
 
