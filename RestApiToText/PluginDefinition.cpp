@@ -226,6 +226,9 @@ void MakeRestCall()
     string headerSeparator(":");
     string portSeparator(":");
     string slashSeparator("/");
+    string varStartTag("$(");
+    string varEndTag(")");
+    string envTag("ENV:");
     string domain;
     string path;
     string verb;
@@ -355,16 +358,6 @@ void MakeRestCall()
                     if (slashIndex != string::npos)
                         path = url.substr(slashIndex, url.length());
                 }
-
-                // If we have a querystring, let's url-encode it
-                size_t queryStringStart = url.find("?");
-
-                if (queryStringStart != string::npos && queryStringStart + 1 < url.length())
-                {
-                    string queryString = url.substr(++queryStringStart);
-                    queryString = UrlEncode(queryString);
-                    url = url.substr(0, queryStringStart) + queryString;
-                }
             }
         }
         else
@@ -385,6 +378,36 @@ void MakeRestCall()
                     LTrim(&strToken);
 
                     headerValue = strToken;
+
+                    string tmpHeaderValue = headerValue;
+
+                    ToUpper(&tmpHeaderValue);
+
+                    // Is this a reference to a variable?
+                    if ((tmpHeaderValue.length() > varStartTag.length() + varEndTag.length()) && tmpHeaderValue.find(varStartTag.c_str(), 0) == 0 && EndsWith(tmpHeaderValue, varEndTag))
+                    {
+                        string hv = tmpHeaderValue.substr(varStartTag.length(), tmpHeaderValue.length() - (varStartTag.length() + varEndTag.length()));
+                        size_t tagPos = hv.find(":", 0);
+
+                        if (tagPos > 0)
+                        {
+                            string tag = hv.substr(0, tagPos + 1);
+                            ToUpper(&tag);
+                            
+                            // Currently only checking for environment variables, but 
+                            if (tag == envTag)
+                            {
+                                if (!GetEnvironmentVar(hv, envTag, headerValue))
+                                {
+                                    hv = hv.substr(envTag.length());
+                                    wstring wsEnvVar(hv.begin(), hv.end());
+                                    wstring errorMessage(L"Could not find environment variable \"" + wsEnvVar + L"\".  If Notepad++ was running when you created the variable, try closing and reopening it.");
+                                    ::MessageBox(nppData._nppHandle, errorMessage.c_str(), TEXT("RestApiToText"), MB_OK);
+                                }
+                            }
+                        }
+                    }
+
                     headers.insert(pair<string, string>(headerName, headerValue));
                 }
             }
@@ -514,6 +537,29 @@ void MakeRestCall()
     ::SendMessage(curScintilla, SCI_SETTEXT, 0, (LPARAM)response.c_str());
 
     delete[] selectedText;
+}
+
+BOOL GetEnvironmentVar(string envVar, string tag, string& returnValue)
+{
+    BOOL success = FALSE;
+    string sEnvVar = envVar.substr(tag.length());
+
+    char* pzEnvVar;
+    errno_t error = _dupenv_s(&pzEnvVar, NULL, sEnvVar.c_str());
+
+    if (pzEnvVar)
+    {
+        success = TRUE;
+        returnValue = pzEnvVar;
+        free(pzEnvVar);
+    }
+
+    return success;
+}
+
+BOOL EndsWith(std::string const& stringToSearch, std::string const& stringToFind)
+{
+    return (stringToSearch.length() >= stringToFind.length() && stringToSearch.compare(stringToSearch.length() - stringToFind.length(), stringToFind.length(), stringToFind) == 0);
 }
 
 void ToUpper(string* token)

@@ -8,17 +8,18 @@ All files for this package are licensed under the GPL v3 license.&nbsp;&nbsp;See
 
 What's New in RestApiToText
 ---------------------------
-1. RestApiToText will automatically pretty-print JSON responses if the response header's __Content-Type__ header is set to __application/json__.
-1. Added new __RestApiToTextOptions__ section to allow users to control the behavior of RestApiToText.
-2. Added the __ShowResponseHeaders__ RestApiToText option to display response headers in addition to the response itself.
-3. Querystrings are now url-encoded before they are sent.
-4. Added the ability to pass a body with the __DELETE__ verb.
-5. Fixed issue where the __PATCH__ verb was not passing the body.
-6. Fixed issue where InternetReadFile was stopping prematurely because the output was being formatted to JSON as it was being read.
+1. Added the ability to use an environment variable when specifying header values, so that you can use a private API key without showing it in your REST call.
+2. RestApiToText will automatically pretty-print JSON responses if the response header's __Content-Type__ header is set to __application/json__.
+3. Added new __RestApiToTextOptions__ section to allow users to control the behavior of RestApiToText.
+4. Added the __ShowResponseHeaders__ RestApiToText option to display response headers in addition to the response itself.
+5. Querystrings are now url-encoded before they are sent.
+6. Added the ability to pass a body with the __DELETE__ verb.
+7. Fixed issue where the __PATCH__ verb was not passing the body.
+8. Fixed issue where InternetReadFile was stopping prematurely because the output was being formatted to JSON as it was being read.
 
 New Releases
 ------------
-You can download the latest version of RestApiToText.dll for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.3.0.0/RestApiToText.zip">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.3.0.0/RestApiToText.zip">here</a> or by navigating the __Release__ and __x64/Release__ folders above. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
+You can download the latest version of RestApiToText.dll for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.3.1.0/RestApiToText.zip">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.3.1.0/RestApiToText.zip">here</a> or by navigating the __Release__ and __x64/Release__ folders above. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
 
 Here are the steps to overwrite the DLL:
 
@@ -63,8 +64,18 @@ Notes
 
 ![screenshot](/Screenshot7.png?raw=true "Example of a formatted REST response and response headers for RestApiToText")
 
+- Use an environment variable whenever you want to send a private API key but you don't want to show it in your REST call.&nbsp;&nbsp;Just create the variable and wrap it in a __$(env:<span style="color:green">*variable name*</span>)__ expression, like so:
+
+![screenshot](/Screenshot8.png?raw=true "Example of a REST call that uses an environment variable")
+![screenshot](/Screenshot9.png?raw=true "Example of a REST call that uses an environment variable")
+
+![screenshot](/Screenshot10.png?raw=true "Example of a REST call that uses an environment variable")
+
 
 ## Changes by Version
+<u>1.3.1.0</u>
+1. Added the ability to use an environment variable when specifying header values, so that you can use a private API key without showing it in your REST call.
+
 <u>1.3.0.0</u>
 1. Added new __**RestApiToTextOptions**__ section to allow users to control the behavior of RestApiToText.
 2. Added RestApiToText option called __ShowResponseHeaders__ to display response headers in addition to the response itself.
