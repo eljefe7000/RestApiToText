@@ -16,10 +16,11 @@ What's New in RestApiToText
 6. Added the ability to pass a body with the __DELETE__ verb.
 7. Fixed issue where the __PATCH__ verb was not passing the body.
 8. Fixed issue where InternetReadFile was stopping prematurely because the output was being formatted to JSON as it was being read.
+9. Fixed issue where the 201 (Created) response was not returning the body.
 
 New Releases
 ------------
-You can download the latest version of RestApiToText.dll for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.3.1.0/RestApiToText.zip">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.3.1.0/RestApiToText.zip">here</a> or by navigating the __Release__ and __x64/Release__ folders above. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
+You can download the latest version of RestApiToText.dll for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.3.1.1/RestApiToText.zip">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.3.1.1/RestApiToText.zip">here</a> or by navigating the __Release__ and __x64/Release__ folders above. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
 
 Here are the steps to overwrite the DLL:
 

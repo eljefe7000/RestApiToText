@@ -318,7 +318,7 @@ void MakeRestCall()
                 }
 
                 strToken = strToken.substr(index);
-                
+
                 // Left trim any whitespace before the URL
                 LTrim(&strToken);
 
@@ -393,7 +393,7 @@ void MakeRestCall()
                         {
                             string tag = hv.substr(0, tagPos + 1);
                             ToUpper(&tag);
-                            
+
                             // Currently only checking for environment variables, but 
                             if (tag == envTag)
                             {
@@ -766,7 +766,7 @@ string CheckForError(HINTERNET hRequest)
         wstring wResponseCode((wchar_t*)lpOutBuffer);
         statusCode = _wtoi(wResponseCode.c_str());
 
-        if (statusCode != HTTP_STATUS_OK && statusCode != 0)
+        if (statusCode != HTTP_STATUS_OK && statusCode != HTTP_STATUS_CREATED && statusCode != 0)
         {
             wResponseCode.append(L" - ");
             response.append(wResponseCode.begin(), wResponseCode.end());
@@ -775,7 +775,7 @@ string CheckForError(HINTERNET hRequest)
 
     delete[] lpOutBuffer;
 
-    if (statusCode != HTTP_STATUS_OK)
+    if (statusCode != HTTP_STATUS_OK && statusCode != HTTP_STATUS_CREATED)
     {
         while (!HttpQueryInfo(hRequest, HTTP_QUERY_STATUS_TEXT, pBuff, &dwLen, NULL))
         {
