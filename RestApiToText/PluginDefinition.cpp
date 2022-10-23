@@ -250,6 +250,7 @@ void MakeRestCall()
     BOOL workingOnOptions = FALSE;
     BOOL httpsProtocolFound = FALSE;
     BOOL showResponseHeaders = FALSE;
+    BOOL showResponseOnSamePage = FALSE;
     map<string, string> headers;
     map<string, string> ::iterator headerIterator;
     char* nextToken;
@@ -428,6 +429,9 @@ void MakeRestCall()
 
                 if (strToken == "SHOWRESPONSEHEADERS")
                     showResponseHeaders = TRUE;
+
+                if (strToken == "SHOWRESPONSEONSAMEPAGE")
+                    showResponseOnSamePage = TRUE;
             }
         }
 
@@ -538,9 +542,15 @@ void MakeRestCall()
     InternetCloseHandle(hConnect);
     InternetCloseHandle(hSession);
 
-    ::SendMessage(nppData._nppHandle, NPPM_MENUCOMMAND, 0, IDM_FILE_NEW);
+    if (!showResponseOnSamePage)
+    {
+        ::SendMessage(nppData._nppHandle, NPPM_MENUCOMMAND, 0, IDM_FILE_NEW);
+        end = 0;
+    }
+
     curScintilla = (which == 0) ? nppData._scintillaMainHandle : nppData._scintillaSecondHandle;
-    ::SendMessage(curScintilla, SCI_SETTEXT, 0, (LPARAM)response.c_str());
+
+    ::SendMessage(curScintilla, SCI_INSERTTEXT, end, (LPARAM)response.c_str());
 
     delete[] selectedText;
 }

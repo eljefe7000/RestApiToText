@@ -99,8 +99,8 @@ BEGIN
     LTEXT           "Content-Type: application/json",IDC_STATIC,21,82,100,8
     LTEXT           "X-Api-Key: 1234",IDC_STATIC,21,92,53,8
     LTEXT           "GET http://localhost:12345/weatherforecast",IDC_STATIC,21,63,144,8
-    LTEXT           "2.  Under the Plugins menu, pick ""REST API To Text"" and ""Make REST Call""",IDC_STATIC,7,198,238,8
-    LTEXT           "3.  A new tab containing the results of the REST call should appear.",IDC_STATIC,7,214,217,8
+    LTEXT           "2.  Under the Plugins menu, pick ""REST API To Text"" and ""Make REST Call""",IDC_STATIC,7,148,238,8
+    LTEXT           "3.  A new tab containing the results of the REST call should appear.",IDC_STATIC,7,163,217,8
     LTEXT           "- To add a body for a POST/PUT, add a **Body** line, then the body.",IDC_STATIC,17,278,226,8
     LTEXT           "- Calls to regular web pages should also work and return the HTML markup.",IDC_STATIC,17,292,241,8
     LTEXT           "**Headers**",IDC_STATIC,21,72,44,8
@@ -115,9 +115,9 @@ BEGIN
     LTEXT           "(Works in the URI, querystring, headers and body)",IDC_STATIC,47,328,194,8
     LTEXT           "- To keep an API key private, create an environment variable for the key and use it like so:",IDC_STATIC,17,305,292,8,SS_CENTERIMAGE
     LTEXT           "X-Api-Key: $(env:YOUR-ENVIRONMENT-VARIABLE-NAME-HERE)",IDC_STATIC,27,318,206,8,SS_CENTERIMAGE
-    LTEXT           "Features Available for RestApiToTextOptions:",IDC_STATIC,8,157,356,8
-    LTEXT           "ShowResponseHeaders - Show response headers in the REST response",IDC_STATIC,26,168,338,8
-    LTEXT           "(The **Headers** line tells RestApiToText that you have headers to send)",IDC_STATIC,17,138,279,8
+    LTEXT           "Features Available for RestApiToTextOptions:",IDC_STATIC,8,190,356,8
+    LTEXT           "ShowResponseHeaders - Show response headers in the REST response.",IDC_STATIC,26,201,338,8
+    LTEXT           "ShowResponseOnSamePage - Show response after the REST call, on the same page.",IDC_STATIC,26,212,338,8
 END
 
 IDD_RESTAPITOTEXT DIALOGEX 0, 0, 331, 141
