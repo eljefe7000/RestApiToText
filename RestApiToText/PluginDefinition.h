@@ -75,6 +75,7 @@ bool setCommand(size_t index, LPCTSTR cmdName, PFUNCPLUGINCMD pFunc, ShortcutKey
 BOOL IsContentTypeResponseHeaderForJson(HINTERNET hRequest);
 BOOL EndsWith(string const& fullString, string const& ending);
 BOOL GetEnvironmentVar(string var, string tag, string& returnValue);
+BOOL InjectEnvironmentVars(string tmpToken, string varStartTag, string varEndTag, string envTag, string& returnValue);
 INT_PTR CALLBACK GenericProcessor(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 string CheckForError(HINTERNET hRequest);
 string GetResponseHeaders(HINTERNET hRequest);

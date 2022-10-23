@@ -311,7 +311,7 @@ void MakeRestCall()
                 // Make the verb lowercase for string comparisons
                 ToUpper(&verb);
 
-                if (!any_of(restVerbs.begin(), restVerbs.end(), [verb](string v) {return v == verb; }))
+                if (!any_of(restVerbs.begin(), restVerbs.end(), [verb](string v) {return v == verb;}))
                 {
                     verb = "GET";
                     index = 0;
@@ -323,7 +323,9 @@ void MakeRestCall()
                 LTrim(&strToken);
 
                 // What's left of strToken should be the URL
-                url = strToken;
+                string tmpToken = strToken;
+
+                InjectEnvironmentVars(tmpToken, varStartTag, varEndTag, envTag, url);
 
                 // Remove the HTTP/S protocol if it's there
                 if (strToken.find(httpProtocol) != string::npos)
@@ -394,7 +396,6 @@ void MakeRestCall()
                             string tag = hv.substr(0, tagPos + 1);
                             ToUpper(&tag);
 
-                            // Currently only checking for environment variables, but 
                             if (tag == envTag)
                             {
                                 if (!GetEnvironmentVar(hv, envTag, headerValue))
@@ -413,7 +414,11 @@ void MakeRestCall()
             }
             else if (workingOnBody)
             {
-                body += strToken;
+                string tmpToken = strToken;
+                string tmpBody;
+                int currPos = 0;
+
+                InjectEnvironmentVars(tmpToken, varStartTag, varEndTag, envTag, body);
             }
             else if (workingOnOptions)
             {
@@ -421,7 +426,8 @@ void MakeRestCall()
                 LTrim(&strToken);
                 ToUpper(&strToken);
 
-                showResponseHeaders = (strToken == "SHOWRESPONSEHEADERS");
+                if (strToken == "SHOWRESPONSEHEADERS")
+                    showResponseHeaders = TRUE;
             }
         }
 
@@ -537,6 +543,65 @@ void MakeRestCall()
     ::SendMessage(curScintilla, SCI_SETTEXT, 0, (LPARAM)response.c_str());
 
     delete[] selectedText;
+}
+
+BOOL InjectEnvironmentVars(string tmpToken, string varStartTag, string varEndTag, string envTag, string& returnValue)
+{
+    BOOL result = FALSE;
+    int currPos = 0;
+    string tmpBody;
+
+    while (tmpToken.length() >= varStartTag.length() + varEndTag.length() && tmpToken.find(varStartTag.c_str(), 0) >= 0)
+    {
+        size_t startTagPos = tmpToken.find(varStartTag, currPos);
+        if (startTagPos != string::npos)
+        {
+            size_t endTagPos = tmpToken.find(varEndTag, startTagPos + 2);
+            if (endTagPos != string::npos)
+            {
+                startTagPos += 2;
+                string contents = tmpToken.substr(startTagPos, endTagPos - startTagPos);
+                size_t colonPos = contents.find(":", 0);
+                if (colonPos != string::npos && colonPos > 0)
+                {
+                    string tag = contents.substr(0, colonPos + 1);
+                    ToUpper(&tag);
+                    if (tag == envTag)
+                    {
+                        string returnValue;
+                        if (!GetEnvironmentVar(contents, envTag, returnValue))
+                        {
+                            wstring wsEnvVar(contents.begin(), contents.end());
+                            wstring errorMessage(L"Could not find environment variable \"" + wsEnvVar + L"\".  If Notepad++ was running when you created the variable, try closing and reopening it.");
+                            ::MessageBox(nppData._nppHandle, errorMessage.c_str(), TEXT("RestApiToText"), MB_OK);
+                            break;
+                        }
+                        else
+                        {
+                            string newContents = tmpToken.substr(0, startTagPos - 2);
+                            newContents += returnValue;
+                            //newContents += tmpToken.substr(endTagPos + 1);
+                            tmpBody += newContents;
+                            tmpToken = tmpToken.substr(endTagPos + 1);
+                        }
+                    }
+                    else
+                        break;
+                }
+                else
+                    break;
+            }
+            else
+                break;
+        }
+        else
+            break;
+    }
+
+    returnValue += tmpBody += tmpToken;
+
+
+    return result;
 }
 
 BOOL GetEnvironmentVar(string envVar, string tag, string& returnValue)

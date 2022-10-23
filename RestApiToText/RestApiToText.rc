@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,3,1,1
- PRODUCTVERSION 1,3,1,1
+ FILEVERSION 1,4,0,0
+ PRODUCTVERSION 1,4,0,0
  FILEFLAGSMASK 0x0L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -68,11 +68,11 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "FileDescription", "RestApiToText: A free Notepad++ plugin to make REST calls."
-            VALUE "FileVersion", "1.3.1.1"
+            VALUE "FileVersion", "1.4.0.0"
             VALUE "LegalCopyright", "Copyleft 2020 by Jeffrey Smith"
             VALUE "OriginalFilename", "RestApiToText.dll"
             VALUE "ProductName", "RestApiToText"
-            VALUE "ProductVersion", "1.3.1.1"
+            VALUE "ProductVersion", "1.4.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -87,34 +87,37 @@ END
 // Dialog
 //
 
-IDD_HELP DIALOGEX 0, 0, 371, 342
+IDD_HELP DIALOGEX 0, 0, 371, 384
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "REST API To Text Help"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,314,321,50,14
+    DEFPUSHBUTTON   "OK",IDOK,314,363,50,14
     LTEXT           "Make a REST API call and get the results in a new Notepad++ tab.",IDC_STATIC,7,7,214,8
     LTEXT           "Here is how it works:",IDC_STATIC,7,21,68,8
     LTEXT           "1.  At the start of a line, type in the elements of a REST call.  Put each header on its own line.",IDC_STATIC,7,36,301,8
     LTEXT           "Content-Type: application/json",IDC_STATIC,21,82,100,8
     LTEXT           "X-Api-Key: 1234",IDC_STATIC,21,92,53,8
     LTEXT           "GET http://localhost:12345/weatherforecast",IDC_STATIC,21,63,144,8
-    LTEXT           "2.  Under the Plugins menu, pick ""REST API To Text"" and ""Make REST Call""",IDC_STATIC,7,159,238,8
-    LTEXT           "3.  A new tab containing the results of the REST call should appear.",IDC_STATIC,7,174,217,8
-    LTEXT           "- To add a body for a POST/PUT, add a **Body** line, then the body.",IDC_STATIC,17,239,226,8
-    LTEXT           "- Calls to regular web pages should also work and return the HTML markup.",IDC_STATIC,17,252,241,8
+    LTEXT           "2.  Under the Plugins menu, pick ""REST API To Text"" and ""Make REST Call""",IDC_STATIC,7,198,238,8
+    LTEXT           "3.  A new tab containing the results of the REST call should appear.",IDC_STATIC,7,214,217,8
+    LTEXT           "- To add a body for a POST/PUT, add a **Body** line, then the body.",IDC_STATIC,17,278,226,8
+    LTEXT           "- Calls to regular web pages should also work and return the HTML markup.",IDC_STATIC,17,292,241,8
     LTEXT           "**Headers**",IDC_STATIC,21,72,44,8
     LTEXT           "(The **Headers** line tells RestApiToText that you have headers to send)",IDC_STATIC,7,129,279,8
-    LTEXT           "- If the page has content besides the REST call, select the REST content before making the call.",IDC_STATIC,17,210,307,8
+    LTEXT           "- If the page has content besides the REST call, select the REST content before making the call.",IDC_STATIC,17,249,307,8
     GROUPBOX        "Example",IDC_STATIC,7,52,171,74
-    GROUPBOX        "Notes",IDC_STATIC,7,194,329,116
-    LTEXT           "- Prepending the URL with HTTP:// or HTTPS:// is optional, as is the port.",IDC_STATIC,17,225,234,8
-    LTEXT           "- For more info on usage and new releases, please click on the project link in the About window.",IDC_STATIC,18,293,307,8
+    GROUPBOX        "Notes",IDC_STATIC,7,233,329,122
+    LTEXT           "- Prepending the URL with HTTP:// or HTTPS:// is optional, as is the port.",IDC_STATIC,17,265,234,8
+    LTEXT           "- For more info on usage and new releases, please click on the project link in the About window.",IDC_STATIC,18,339,307,8
     LTEXT           "**RestApiToTextOptions**",IDC_STATIC,21,103,89,8
     LTEXT           "ShowResponseHeaders",IDC_STATIC,22,113,76,8
-    LTEXT           "(The **RestApiToTextOptions** line and options allow you to control the behavior of RestApiToText)",IDC_STATIC,7,140,356,8
-    LTEXT           "- To keep an API key private, create an environment variable for the key and use it like so:",IDC_STATIC,17,266,292,8,SS_CENTERIMAGE
-    LTEXT           "X-Api-Key: $(env:YOUR-ENVIRONMENT-VARIABLE-NAME-HERE)",IDC_STATIC,27,278,206,8,SS_CENTERIMAGE
+    LTEXT           "(Works in the URI, querystring, headers and body)",IDC_STATIC,47,328,194,8
+    LTEXT           "- To keep an API key private, create an environment variable for the key and use it like so:",IDC_STATIC,17,305,292,8,SS_CENTERIMAGE
+    LTEXT           "X-Api-Key: $(env:YOUR-ENVIRONMENT-VARIABLE-NAME-HERE)",IDC_STATIC,27,318,206,8,SS_CENTERIMAGE
+    LTEXT           "Features Available for RestApiToTextOptions:",IDC_STATIC,8,157,356,8
+    LTEXT           "ShowResponseHeaders - Show response headers in the REST response",IDC_STATIC,26,168,338,8
+    LTEXT           "(The **Headers** line tells RestApiToText that you have headers to send)",IDC_STATIC,17,138,279,8
 END
 
 IDD_RESTAPITOTEXT DIALOGEX 0, 0, 331, 141
@@ -128,7 +131,7 @@ BEGIN
     RTEXT           "License:",IDC_STATIC_LICENSE_LABEL,10,42,52,8
     LTEXT           "GNU GPL v3",IDC_STATIC_LICENSE,66,43,39,8
     RTEXT           "Version:",IDC_STATIC_VERSION_LABEL,10,60,52,8
-    LTEXT           "1.3.1.1",IDC_STATIC_VERSION,66,60,44,8
+    LTEXT           "1.4.0.0",IDC_STATIC_VERSION,66,60,44,8
     RTEXT           "Project:",IDC_STATIC_PROJECT_LABEL,10,78,52,8
     CONTROL         "<a href=""https://github.com/eljefe7000/RestApiToText"">https://github.com/eljefe7000/RestApiToText</a>",IDC_SYSLINK_PROJECT,
                     "SysLink",WS_TABSTOP,67,78,155,12
@@ -151,7 +154,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 364
         TOPMARGIN, 7
-        BOTTOMMARGIN, 335
+        BOTTOMMARGIN, 377
     END
 
     IDD_RESTAPITOTEXT, DIALOG

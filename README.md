@@ -15,8 +15,9 @@ What's New in RestApiToText
 5. Querystrings are now url-encoded before they are sent.
 6. Added the ability to pass a body with the __DELETE__ verb.
 7. Fixed issue where the __PATCH__ verb was not passing the body.
-8. Fixed issue where InternetReadFile was stopping prematurely because the output was being formatted to JSON as it was being read.
-9. Fixed issue where the 201 (Created) response was not returning the body.
+8. Fixed issue where __InternetReadFile__ was stopping prematurely because the output was being formatted to JSON as it was being read.
+9. Fixed issue where the __201 (Created)__ response was not returning the body.
+10. Added ability to use environment variables in the body.
 
 New Releases
 ------------
@@ -74,6 +75,12 @@ Notes
 
 
 ## Changes by Version
+<u>1.3.1.2</u>
+1. Added the ability to use an environment variable in the body.
+
+<u>1.3.1.1</u>
+1. Fixed bug where 201 responses did not include the body.
+
 <u>1.3.1.0</u>
 1. Added the ability to use an environment variable when specifying header values, so that you can use a private API key without showing it in your REST call.
 
