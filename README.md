@@ -17,11 +17,12 @@ What's New in RestApiToText
 7. Fixed issue where the __PATCH__ verb was not passing the body.
 8. Fixed issue where __InternetReadFile__ was stopping prematurely because the output was being formatted to JSON as it was being read.
 9. Fixed issue where the __201 (Created)__ response was not returning the body.
-10. Added ability to use environment variables in the body.
+10. Added ability to use environment variables in the body and the URL.
+11. Added ability to show response on the same page, after the REST call.
 
 New Releases
 ------------
-You can download the latest version of RestApiToText.dll for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.3.1.1/RestApiToText.zip">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.3.1.1/RestApiToText.zip">here</a> or by navigating the __Release__ and __x64/Release__ folders above. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
+You can download the latest version of RestApiToText.dll for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.4.0.0/RestApiToText.zip">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.4.0.0/RestApiToText.zip">here</a> or by navigating the __Release__ and __x64/Release__ folders above. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
 
 Here are the steps to overwrite the DLL:
 
@@ -73,8 +74,24 @@ Notes
 
 ![screenshot](/Screenshot10.png?raw=true "Example of a REST call that uses an environment variable")
 
+![screenshot](/Screenshot11.png?raw=true "Example of a REST call that uses an environment variable in the URL, a header, and the body")
+![screenshot](/Screenshot12.png?raw=true "Example of a REST call that uses an environment variable in the URL, a header, and the body")
+![screenshot](/Screenshot13.png?raw=true "Example of a REST call that uses an environment variable in the URL, a header, and the body")
+![screenshot](/Screenshot14.png?raw=true "Example of a REST call that uses an environment variable in the URL, a header, and the body")
+![screenshot](/Screenshot15.png?raw=true "Example of a REST call that uses an environment variable in the URL, a header, and the body")
+![screenshot](/Screenshot16.png?raw=true "Example of a REST call that uses an environment variable in the URL, a header, and the body")
+
+- Use the **RestApiToTextOptions** section for custom __RestApiToText__ features:
+*(The following two features are currently available)*
+![screenshot](/Screenshot17.png?raw=true "Examples of RestApiToTextOptions")
+
+
 
 ## Changes by Version
+<u>1.4.0.0</u>
+1. Added the ability to use an environment variable in the body and the URL.
+2. Added the ability to show the response on the same page as the REST call.
+
 <u>1.3.1.2</u>
 1. Added the ability to use an environment variable in the body.
 
