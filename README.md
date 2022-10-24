@@ -83,6 +83,7 @@ Notes
 
 - Use the **RestApiToTextOptions** section for custom __RestApiToText__ features:
 *(The following two features are currently available)*
+
 ![screenshot](/Screenshot17.png?raw=true "Examples of RestApiToTextOptions")
 
 
