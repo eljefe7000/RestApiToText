@@ -19,10 +19,11 @@ What's New in RestApiToText
 9. Fixed issue where the __201 (Created)__ response was not returning the body.
 10. Added ability to use environment variables in the body and the URL.
 11. Added ability to show response on the same page, after the REST call.
+12. Fixed issue where body was not being returned on all calls.
 
 New Releases
 ------------
-You can download the latest version of RestApiToText.dll for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.4.0.0/RestApiToText.zip">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.4.0.0/RestApiToText.zip">here</a> or by navigating the __Release__ and __x64/Release__ folders above. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
+You can download the latest version of RestApiToText.dll for 32-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/Release/v1.4.0.1/RestApiToText.zip">here</a> and for 64-bit <a href="https://github.com/eljefe7000/RestApiToText/raw/master/x64/Release/v1.4.0.1/RestApiToText.zip">here</a> or by navigating the __Release__ and __x64/Release__ folders above. You just need to download the DLL and overwrite it in the appropriate subfolder of the Notepad++ plugins admin folder.
 
 Here are the steps to overwrite the DLL:
 
@@ -89,6 +90,9 @@ Notes
 
 
 ## Changes by Version
+<u>1.4.0.1</u>
+1. Fixed issue where body was not being returned on all calls.
+
 <u>1.4.0.0</u>
 1. Added the ability to use an environment variable in the body and the URL.
 2. Added the ability to show the response on the same page as the REST call.

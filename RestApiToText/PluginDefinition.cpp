@@ -496,45 +496,44 @@ void MakeRestCall()
 
             if (!errorMessage.empty())
                 response = errorMessage;
-            else
+
+            DWORD dwBufSize = BUFSIZ + 1;
+            char* buffer = new char[BUFSIZ + 1];
+            memset(buffer, 0x00, sizeof(buffer));
+
+
+            while (true)
             {
-                DWORD dwBufSize = BUFSIZ + 1;
-                char* buffer = new char[BUFSIZ + 1];
-                memset(buffer, 0x00, sizeof(buffer));
+                DWORD dwBytesRead;
+                BOOL bRead;
 
+                bRead = InternetReadFile(hRequest, buffer, BUFSIZ, &dwBytesRead);
 
-                while (true)
+                string strBuffer(buffer);
+                wstring wStrBuffer(strBuffer.begin(), strBuffer.end());
+
+                if (dwBytesRead == 0)
+                    break;
+
+                if (!bRead)
                 {
-                    DWORD dwBytesRead;
-                    BOOL bRead;
-
-                    bRead = InternetReadFile(hRequest, buffer, BUFSIZ, &dwBytesRead);
-
-                    string strBuffer(buffer);
-                    wstring wStrBuffer(strBuffer.begin(), strBuffer.end());
-
-                    if (dwBytesRead == 0)
-                        break;
-
-                    if (!bRead)
-                    {
-                        DWORD dwError = GetLastError();
-                        response.append("InternetReadFile error: ");
-                        break;
-                    }
-                    else
-                    {
-                        buffer[dwBytesRead] = 0;
-                        response += strBuffer.substr(0, dwBytesRead);
-                    }
+                    DWORD dwError = GetLastError();
+                    response.append("InternetReadFile error: ");
+                    break;
                 }
-
-                if (contentTypeIsJson)
-                    response = FormatResponseIntoJson(response);
-
-                if (showResponseHeaders)
-                    response = GetResponseHeaders(hRequest) + "\n\n" + response;
+                else
+                {
+                    buffer[dwBytesRead] = 0;
+                    response += strBuffer.substr(0, dwBytesRead);
+                }
             }
+
+            if (contentTypeIsJson)
+                response = FormatResponseIntoJson(response);
+
+            if (showResponseHeaders)
+                response = GetResponseHeaders(hRequest) + "\n\n" + response;
+
         }
     }
 
@@ -841,7 +840,7 @@ string CheckForError(HINTERNET hRequest)
         wstring wResponseCode((wchar_t*)lpOutBuffer);
         statusCode = _wtoi(wResponseCode.c_str());
 
-        if (statusCode != HTTP_STATUS_OK && statusCode != HTTP_STATUS_CREATED && statusCode != 0)
+        if (statusCode / 100 > 2)
         {
             wResponseCode.append(L" - ");
             response.append(wResponseCode.begin(), wResponseCode.end());
@@ -877,6 +876,7 @@ string CheckForError(HINTERNET hRequest)
         {
             wstring wBuff(pBuff);
             response.append(wBuff.begin(), wBuff.end());
+            response.append("\n\n");
         }
 
 
